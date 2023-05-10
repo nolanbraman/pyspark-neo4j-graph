@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "certus-takehome-braman-2023"
+version = "0.1.0"
+description = "Data cleanup and consumption using spark for certus takehome project."
+authors = ["nolanbraman <nolan.braman@gmail.com>"]
+readme = "README.md"
+packages = [{include = "certus_takehome_braman_2023"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mypy = "^1.2.0"
+pyspark = {extras = ["sql"], version = "^3.4.0"}
+neo4j-driver = "^5.8.0"
+neo4j = "^5.8.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
