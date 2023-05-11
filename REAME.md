@@ -16,11 +16,11 @@ There are two current ways to run the project.
 The first is to use poetry, [which has installation docs here](https://python-poetry.org/docs/) and then run  
 `poetry install`  
 `poetry shell`  
-`python app/main.py`
+`python app`
 
 The other is to use the requirements.txt sourced from the poetry file. This is  
 `pip install requirements.txt`.
-`python app/main.py`
+`python app`
 
 This will likely clutter your dev environment, and peotry is the cleaner option, but I am also working on a dockerfile, time permitting to just run all of this in a self-contained way.
 
