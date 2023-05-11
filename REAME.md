@@ -26,7 +26,7 @@ This will likely clutter your dev environment, and peotry is the cleaner option,
 
 There are a few design decisions. First is a relatively minor choice of not dropping rows of data that were missing lat and lon in Demo Data- Task Management System - Projects.csv
 
-The null fields are instead fed a placeholder value of 0.0, 0.0. There's an argument here to just leave them `Null` or `None`, and there is also an argument to use dropna() on the rows missing fields, but lat and lon seemed relatively minor in the scheme of things and could be filled in 'later'. Another way to have done this would be to do dropna(thresh=3), to drop any rows missing values for 3/4 columns.
+The null fields are instead fed a placeholder value of 0.0, 0.0. There's an argument here to just leave them `Null` or `None`, and there is also an argument to use dropna() on the rows missing fields, but lat and lon seemed relatively minor in the scheme of things and could be filled in 'later'. Another way to have done this would be to do dropna(thresh=3), to drop any rows missing values for 3/4 columns. There's also a saved csv that completely drops the lat and lon, which decreases size taken by the db and some computational cycles. But, that's an argument for what this data is exactly supposed to do, and seemed acceptable to leave for the first iteration.
 
 Next, I left column headers alone in terms of casing. It's likely better practice to have all columns the same casing, but for this situation, that seemed more of a detail to fix at the end, if ever.
 
