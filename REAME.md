@@ -1,5 +1,7 @@
 # Centus Data Cleanup, Query, and Property Graph Takehome
 
+![Centus Exploratory Graph](https://i.imgur.com/m2EFQwy.png)
+
 ## Running the project
 
 You will need to have hadoop and spark installed. You can find the links here.
