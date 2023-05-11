@@ -1,5 +1,5 @@
 from neo4j_driver import Neo4jDriver
-from data_analysis import DataAnalysisSystem
+from data_analysis_system import DataAnalysisSystem
 
 
 if __name__ == "__main__":
