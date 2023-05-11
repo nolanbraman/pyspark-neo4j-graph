@@ -1,4 +1,3 @@
-import glob
 from neo4j_driver import Neo4jDriver
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.types import *
@@ -53,14 +52,8 @@ def highest_roi_client(df_ops, df_time) -> DataFrame:
 if __name__ == "__main__":
     spark = SparkSession.builder.appName("centus_demo").getOrCreate()
 
-    # Define the columns to select
-    columns_to_select = ["Customer_Name", "Invoice_Number", "Amount", "Date"]
-
-    # List of CSV file paths
+    # Path to dir of csv datasets
     dataset_path = "datasets/"
-
-    # List of CSV files
-    files = glob.glob("*.csv")
 
     # Read the CSV files into cleaned up dataframes
     df_task_management = (
@@ -68,8 +61,6 @@ if __name__ == "__main__":
         .na.fill(0.0, "lat")
         .na.fill(0.0, "lon")
     )
-
-    write_to_csv(df_task_management, "output/task_management")
 
     df_task_management.show()
 
@@ -93,9 +84,9 @@ if __name__ == "__main__":
     # Drop the lat and lon columns, reduce visual clutter
     df_hours_per_project_no_location = df_hours_per_project.drop("lat").drop("lon")
 
-    # Write the dataframes to CSV files for manual review
+    # Write some of the dataframes to CSV files for manual review
+    write_to_csv(df_task_management, "output/task_management")
     write_to_csv(df_hours_per_project, "output/hours_per_project_per_employee")
-
     write_to_csv(
         df_hours_per_project_no_location,
         "output/hours_per_project_per_employee_no_location",
@@ -111,10 +102,11 @@ if __name__ == "__main__":
 
     neo = Neo4jDriver("bolt://54.172.30.170:7687", "neo4j", "boot-issue-volumes")
 
-    for row in df_task_management.collect():
-        neo.add_customer(
-            row["Customer_Name"], row["Project_Name"], row["lat"], row["lon"]
-        )
+    # Wipe the data from the database from previous runs.
+    neo.wipe_data()
+
+    for row in df_task_management.drop("lat").drop("lon").collect():
+        neo.add_customer(row["Customer_Name"], row["Project_Name"])
 
     for row in df_business_ops.collect():
         neo.add_business_ops(
@@ -132,5 +124,6 @@ if __name__ == "__main__":
             hours=row["Hours"],
         )
 
+    print("Data writes complete")
     # Stop the SparkSession
     spark.stop()

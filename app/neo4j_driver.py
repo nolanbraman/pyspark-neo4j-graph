@@ -10,6 +10,10 @@ class Neo4jDriver:
     def close(self):
         self.driver.close()
 
+    def wipe_data(self):
+        with self.driver.session() as session:
+            session.execute_write(self._wipe_data)
+
     def add_customer(self, customer_name: str, project_name: str, lat: int, lon: int):
         with self.driver.session() as session:
             session.execute_write(
@@ -45,6 +49,19 @@ class Neo4jDriver:
             )
 
     @staticmethod
+    def _wipe_data(tx):
+        tx.run("match(c:Customer)-[r:OWNS]-() delete r;")
+        tx.run("match(c)-[r2:HAS_INVOICE]->() delete r2;")
+        tx.run(
+            "match(e)-[r3:WORKED_FOR]->(c) WHERE type(r3) = 'WORKED_FOR'  delete r3;"
+        )
+        tx.run("match(e)-[r4:WORKED_ON ]->(p) WHERE type(r4) = 'WORKED_ON'  delete r4;")
+        tx.run("match(c:Customer) delete c ;")
+        tx.run("match(p:Project) delete p ;")
+        tx.run("match(i:Invoice) delete i;")
+        tx.run("match(e:Employee) delete e;")
+
+    @staticmethod
     def _create_customers_and_relationships(
         tx, customer_name: str, project_name: str, lat: int, lon: int
     ) -> None:
@@ -75,7 +92,7 @@ class Neo4jDriver:
     ):
         tx.run(
             """
-            MERGE (employee:Employee {name: $employee_name})
+            MERGE (employee:Employee {name: $employee_name}) 
             MERGE (customer:Customer {name: $customer_name})
             MERGE (employee)-[:WORKED_FOR]->(customer)
             """,
@@ -87,7 +104,7 @@ class Neo4jDriver:
             """
             MATCH (employee:Employee {name: $employee_name})
             MATCH (project:Project {project_name: $project_name})
-            MERGE (employee)-[r:WORKED_ON]->(project)
+            MERGE (employee)-[r:WORKED_ON ]->(project)
             ON CREATE SET r.hours = $hours
             ON MATCH SET r.hours = r.hours + $hours
             """,
