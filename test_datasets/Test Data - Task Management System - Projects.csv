@@ -1,0 +1,5 @@
+Customer_Name,Amount,lat,lon
+Client A,$100,12.345,67.890
+Client B,$200,34.567,-12.345
+Client C,$150,56.789,-45.678
+Client A,$300,78.901,-78.901
