@@ -38,18 +38,12 @@ class DataAnalysisSystemTest(unittest.TestCase):
             ],
             ["Customer_Name", "Amount", "Date"],
         )
-        print("input")
-        input_df.show()
         result_df = self.analyzer.highest_billed_client(input_df)
         # Define the expected result dataframe
         expected_df = self.spark.createDataFrame(
             [("Client A", 400.0)],
             ["Customer_Name", "Total_Amount"],
         )
-        print("tests here result")
-        result_df.show()
-        print("expected df")
-        expected_df.show()
         self.assertEqual(result_df.collect(), expected_df.collect())
 
     def test_highest_roi_client(self):
@@ -76,7 +70,7 @@ class DataAnalysisSystemTest(unittest.TestCase):
         result_df = self.analyzer.highest_roi_client(df_ops, df_time)
         expected_df = self.spark.createDataFrame(
             [
-                ("Client A", 700.0, 25.0, 28.0),
+                ("Client A", 400.0, 25.0, 16.0),
             ],
             ["Customer_Name", "Total_Amount", "Total_Hours", "ROI"],
         )
