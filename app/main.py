@@ -2,22 +2,17 @@ import glob
 from neo4j_driver import Neo4jDriver
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.types import *
-from pyspark.sql.functions import col, sum, max, regexp_replace
+from pyspark.sql.functions import col, sum, regexp_replace
 from pyspark.sql import SparkSession
-
-from neo4j import GraphDatabase, basic_auth
 
 
 def clean_data(path: str, file_name: str) -> DataFrame:
-    temp_df = (
-        spark.read.csv(
-            path + file_name,
-            header=True,
-            inferSchema=True,
-        )
-        .na.drop()
-        .dropDuplicates()
-    )
+    temp_df = spark.read.csv(
+        path + file_name,
+        header=True,
+        inferSchema=True,
+    ).dropDuplicates()
+
     # Replace the $ and , in the Amount column and cast it to double, if Amount col exists
     if "Amount" in temp_df.columns:
         temp_df = temp_df.withColumn(
@@ -68,9 +63,15 @@ if __name__ == "__main__":
     files = glob.glob("*.csv")
 
     # Read the CSV files into cleaned up dataframes
-    df_task_management = clean_data(
-        dataset_path, "Demo Data- Task Management System - Projects.csv"
+    df_task_management = (
+        clean_data(dataset_path, "Demo Data- Task Management System - Projects.csv")
+        .na.fill(0.0, "lat")
+        .na.fill(0.0, "lon")
     )
+
+    write_to_csv(df_task_management, "output/task_management")
+
+    df_task_management.show()
 
     df_business_ops = clean_data(
         dataset_path, "Demo Data-Business Ops_Invoice Tracking System  - Invoices.csv"
@@ -108,8 +109,28 @@ if __name__ == "__main__":
     print("Client with highest ROI: ")
     highest_roi_client(df_business_ops, df_employee_time_tracking).show()
 
-    neo4j_driver = Neo4jDriver(
-        "bolt://3.88.131.222:7687", "neo4j", "alcoholics-conditions-tops"
-    )
+    neo = Neo4jDriver("bolt://54.172.30.170:7687", "neo4j", "boot-issue-volumes")
+
+    for row in df_task_management.collect():
+        neo.add_customer(
+            row["Customer_Name"], row["Project_Name"], row["lat"], row["lon"]
+        )
+
+    for row in df_business_ops.collect():
+        neo.add_business_ops(
+            customer_name=row["Customer_Name"],
+            invoice_number=row["Invoice_Number"],
+            invoice_amount=row["Amount"],
+            invoice_date=row["Date"],
+        )
+
+    for row in df_employee_time_tracking.collect():
+        neo.add_employees(
+            employee_name=row["Employee_Name"],
+            project_name=row["Project_Name"],
+            customer_name=row["Customer_Name"],
+            hours=row["Hours"],
+        )
+
     # Stop the SparkSession
     spark.stop()
