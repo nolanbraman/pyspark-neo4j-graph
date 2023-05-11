@@ -76,7 +76,8 @@ class DataAnalysisSystem:
             df_highest_billed_client = (
                 df.groupBy("Customer_Name")
                 .agg(sum("Amount").alias("Total_Amount"))
-                .orderBy(col("Total_Amount").desc().limit(1))
+                .orderBy(col("Total_Amount").desc())
+                .limit(1)
             )
             print("Client with the highest billing:")
             return df_highest_billed_client.select(

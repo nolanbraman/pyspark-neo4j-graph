@@ -73,13 +73,6 @@ class DataAnalysisSystemTest(unittest.TestCase):
             ["Customer_Name", "Hours"],
         )
 
-        df_employee = self.spark.read.csv(
-            self.dataset_path
-            + "Test Data-Employee Time Tracking System - Ops Employee.csv",
-            header=True,
-            inferSchema=True,
-        )
-
         result_df = self.analyzer.highest_roi_client(df_ops, df_time)
         expected_df = self.spark.createDataFrame(
             [
