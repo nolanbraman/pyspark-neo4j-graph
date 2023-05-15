@@ -242,6 +242,6 @@ class Neo4jDriver:
 if __name__ == "__main__":
     # Example usage of Neo4jDriver class
     greeter = Neo4jDriver(
-        "bolt://3.88.131.222:7687", "neo4j", "alcoholics-conditions-tops"
+        "url", "neo4j", "pwd"
     )
     greeter.close()
